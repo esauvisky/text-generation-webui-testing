@@ -10,7 +10,7 @@
 #### Depends on:
 https://github.com/Ph0rk0z/GPTQ-Merged
 
-git+https://github.com/huggingface/transformers@9eae4aa57650c1dbe1becd4e0979f6ad1e572ac0
+https://github.com/huggingface/transformers/commit/9eae4aa57650c1dbe1becd4e0979f6ad1e572ac0
 
 https://github.com/Curlypla/peft-GPTQ
 
