@@ -30,7 +30,7 @@ pip install git+https://github.com/huggingface/transformers
 #### How?
 
 * Clone and re-use your oobabooga/text-generation-webui conda environment.
-* Build GPTQ kernel with python setup.py install after cloing into repositories/
+* Build GPTQ kernel with ```python setup_cuda.py install``` after cloing into repositories/
 * Also build and install patched PEFT.
 
 #### Windows?
