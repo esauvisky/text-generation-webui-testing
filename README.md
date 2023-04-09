@@ -283,7 +283,7 @@ Optionally, you can use the following command-line flags:
 | `--model_type MODEL_TYPE` | GPTQ: Model type of pre-quantized model. Currently LLaMA, OPT, and GPT-J are supported. |
 | `--groupsize GROUPSIZE`   | GPTQ: Group size. |
 | `--pre_layer PRE_LAYER`   | GPTQ: The number of layers to allocate to the GPU. Setting this parameter enables CPU offloading for 4-bit models. |
-| `--autograd AUTOGRAD`   | GPTQ: Use autograd implementation. It is faster in this repo by a lot. |
+| `--autograd`   | GPTQ: Use autograd implementation. It is faster in this repo by a lot. |
 
 #### FlexGen
 
