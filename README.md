@@ -49,7 +49,6 @@ python server.py --model opt-13b --chat --autograd --wbits 4 --lora opt-13b-lora
 python server.py --model oasst-sft-1-pythia-12b --chat --autograd --wbits 4 --model_type gptneox
 ```
 
-
 |![Image1](https://github.com/oobabooga/screenshots/raw/main/qa.png) | ![Image2](https://github.com/oobabooga/screenshots/raw/main/cai3.png) |
 |:---:|:---:|
 |![Image3](https://github.com/oobabooga/screenshots/raw/main/gpt4chan.png) | ![Image4](https://github.com/oobabooga/screenshots/raw/main/galactica.png) |
@@ -78,7 +77,6 @@ python server.py --model oasst-sft-1-pythia-12b --chat --autograd --wbits 4 --mo
 * [LoRA (loading and training)](https://github.com/oobabooga/text-generation-webui/wiki/Using-LoRAs)
 * Softprompts
 * [Extensions](https://github.com/oobabooga/text-generation-webui/wiki/Extensions)
-* [Google Colab](https://github.com/oobabooga/text-generation-webui/wiki/Running-on-Colab)
 
 ## Installation
 
@@ -285,6 +283,7 @@ Optionally, you can use the following command-line flags:
 | `--model_type MODEL_TYPE` | GPTQ: Model type of pre-quantized model. Currently LLaMA, OPT, and GPT-J are supported. |
 | `--groupsize GROUPSIZE`   | GPTQ: Group size. |
 | `--pre_layer PRE_LAYER`   | GPTQ: The number of layers to allocate to the GPU. Setting this parameter enables CPU offloading for 4-bit models. |
+| `--autograd AUTOGRAD`   | GPTQ: Use autograd implementation. It is faster in this repo by a lot. |
 
 #### FlexGen
 
