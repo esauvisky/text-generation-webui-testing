@@ -320,15 +320,11 @@ Optionally, you can use the following command-line flags:
 | `--model_type MODEL_TYPE` | GPTQ: Model type of pre-quantized model. Currently LLaMA, OPT, and GPT-J are supported. |
 | `--groupsize GROUPSIZE`   | GPTQ: Group size. |
 | `--pre_layer PRE_LAYER`   | GPTQ: The number of layers to allocate to the GPU. Setting this parameter enables CPU offloading for 4-bit models. |
-<<<<<<< HEAD
 | `--autograd`   | GPTQ: Autograd implementation to use 4bit lora and run multiple models |
 | `--v1`   | GPTQ: Explicitly declare a GPTQv1 model to load into autograd. |
-=======
 | `--no-quant_attn`         | GPTQ: Disable quant attention for triton. If you encounter incoherent results try disabling this. |
->>>>>>> b57ffc2ec9bc32ff0cc82ba97edf4986ecf426fb
 | `--no-warmup_autotune`    | GPTQ: Disable warmup autotune for triton. |
 | `--no-fused_mlp`          | GPTQ: Disable fused mlp for triton. If you encounter "Unexpected mma -> mma layout conversion" try disabling this. |
-| `--monkey-patch`          | GPTQ: Apply the monkey patch for using LoRAs with quantized models. |
 
 #### FlexGen
 
