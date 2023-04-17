@@ -99,12 +99,6 @@ def load_model(model_name):
 
         return model, tokenizer
 
-    # Quantized model
-    elif shared.args.wbits > 0:
-            from modules.GPTQ_loader import load_quantized
-
-            model = load_quantized(model_name)
-
     # llamacpp model
     elif shared.is_llamacpp:
         from modules.llamacpp_model_alternative import LlamaCppModel
@@ -115,11 +109,12 @@ def load_model(model_name):
         model, tokenizer = LlamaCppModel.from_pretrained(model_file)
         return model, tokenizer
 
-    elif shared.is_chatglm:
-        model = AutoModel.from_pretrained(Path(f'{shared.args.model_dir}/{shared.model_name}'), trust_remote_code=True).cuda().half()
-        tokenizer = AutoTokenizer.from_pretrained(Path(f'{shared.args.model_dir}/{shared.model_name}'), trust_remote_code=True)
-        print('ChatGLM May Execute Remote Code')
-        return model, tokenizer
+    # Quantized model
+    elif shared.args.wbits > 0:
+            from modules.GPTQ_loader import load_quantized
+
+            model = load_quantized(model_name)
+
     # Custom
     else:
         params = {"low_cpu_mem_usage": True}

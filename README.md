@@ -324,7 +324,7 @@ Optionally, you can use the following command-line flags:
 | `--v1`   | GPTQ: Explicitly declare a GPTQv1 model to load into autograd. |
 | `--no-quant_attn`         | GPTQ: Disable quant attention for triton. If you encounter incoherent results try disabling this. |
 | `--no-warmup_autotune`    | GPTQ: Disable warmup autotune for triton. |
-| `--no-fused_mlp`          | GPTQ: Disable fused mlp for triton. If you encounter "Unexpected mma -> mma layout conversion" try disabling this. |
+| `--no-fused_mlp`          | GPTQ: Disable fused mlp for triton. If you encounter "Unexpected mma -> mma layout conversion" try disabling this. Disabling may also help model splitting for multi-gpu setups.|
 
 #### FlexGen
 
