@@ -21,6 +21,13 @@ https://github.com/Ph0rk0z/GPTQ-Merged (dual module branch)
 
 https://github.com/sterlind/peft
 
+4/18/23
+```
+Using the patch for PEFT and no longer depends on PEFT fork.
+Makes it easier to run main branch side by side.
+Rewrote the GPTQ loader as well to be more compact.
+You may have to update tokenizers agian and install colorama from pip.
+```
 4/11/23
 ```
 Update to new PEFT version
