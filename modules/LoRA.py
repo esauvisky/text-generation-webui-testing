@@ -30,10 +30,6 @@ def add_lora_to_model(lora_names):
     added_set = set(lora_names) - prior_set
     removed_set = prior_set - set(lora_names)
     shared.lora_names = list(lora_names)
-    sys.path.insert(0, str(Path("repositories/GPTQ-Merged/src/alpaca_lora_4bit")))
-    from monkeypatch.peft_tuners_lora_monkey_patch import replace_peft_model_with_gptq_lora_model
-    replace_peft_model_with_gptq_lora_model()
-
     
     if len(removed_set) > 0 and shared.args.autograd:
        from modules.models import reload_model

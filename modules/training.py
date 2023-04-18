@@ -7,8 +7,8 @@ import traceback
 from pathlib import Path
 
 #For GPTQ and autograd
-sys.path.insert(0, str(Path("repositories/GPTQ-Merged/src/alpaca_lora_4bit")))
-sys.path.insert(0, str(Path("repositories/GPTQ-Merged/src/gptq_llama")))
+#sys.path.insert(0, str(Path("repositories/GPTQ-Merged/src/alpaca_lora_4bit")))
+#sys.path.insert(0, str(Path("repositories/GPTQ-Merged/src/gptq_llama")))
 
 import gradio as gr
 import torch
