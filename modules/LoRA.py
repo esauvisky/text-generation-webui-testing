@@ -6,21 +6,23 @@ import modules.shared as shared
 
 def autograd_add (lora_path):
 
-    #not sure this will stack loras yet
+    #Loras Do not Stack yet.
 
     sys.path.insert(0, str(Path("repositories/GPTQ-Merged/src/alpaca_lora_4bit")))
-    import autograd_4bit, quant
-    from autograd_4bit import Autograd4bitQuantLinear
-       
-    sys.path.insert(0, 'repositories/peft/src')
+    from monkeypatch.peft_tuners_lora_monkey_patch import replace_peft_model_with_gptq_lora_model
+    replace_peft_model_with_gptq_lora_model()
+      
     from peft import PeftModel
-    
+    #Not sure what happens in offload    
     print('Autograd Add Lora', lora_path)
     shared.model = PeftModel.from_pretrained(shared.model, lora_path, device_map={'': 0}, torch_dtype=torch.float32)
     
     from modules.GPTQ_loader import finalize_autograd
     finalize_autograd(shared.model)
-    print('Finalize Lora')
+    print('Finalize Lora\nNote: Only one lora works with 4bit for the time being.\n Please only add one at a time and remove all loras before switching!')
+
+
+
 
 
 def add_lora_to_model(lora_names):
@@ -28,6 +30,10 @@ def add_lora_to_model(lora_names):
     added_set = set(lora_names) - prior_set
     removed_set = prior_set - set(lora_names)
     shared.lora_names = list(lora_names)
+    sys.path.insert(0, str(Path("repositories/GPTQ-Merged/src/alpaca_lora_4bit")))
+    from monkeypatch.peft_tuners_lora_monkey_patch import replace_peft_model_with_gptq_lora_model
+    replace_peft_model_with_gptq_lora_model()
+
     
     if len(removed_set) > 0 and shared.args.autograd:
        from modules.models import reload_model
@@ -38,8 +44,8 @@ def add_lora_to_model(lora_names):
        autograd_add(lora_path)
        print ('Lora Added:', lora_path, Path(f"{shared.args.lora_dir}/{lora_names[0]}"))
        return
-    if not(shared.args.autograd):
-       from peft import PeftModel
+
+    from peft import PeftModel
 
     # Nothing to do = skip.
     if len(added_set) == 0 and len(removed_set) == 0:
@@ -55,6 +61,10 @@ def add_lora_to_model(lora_names):
        # If removing anything, disable all and re-add.
     if len(removed_set) > 0:
         shared.model.disable_adapter()
+    #    if shared.args.autograd:
+    #       from modules.models import reload_model
+    #       reload_model() #remove lora
+    
 
     if len(lora_names) > 0:
         print("Applying the following LoRAs to {}: {}".format(shared.model_name, ', '.join(lora_names)))
@@ -77,7 +87,11 @@ def add_lora_to_model(lora_names):
             shared.model.load_adapter(Path(f"{shared.args.lora_dir}/{lora}"), lora)
       
         if not shared.args.load_in_8bit and not shared.args.cpu:
-            #if not shared.args.monkey_patch: is this where my multi lora broke?
+            #if shared.args.autograd: 
+            #   from modules.GPTQ_loader import finalize_autograd
+            #   finalize_autograd(shared.model)
+            #   print('Finalize Lora')
+            #else:
             shared.model.half()
             if not hasattr(shared.model, "hf_device_map"):
                 if torch.has_mps:

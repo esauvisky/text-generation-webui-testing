@@ -65,7 +65,7 @@ def load_autograd (config_path, model_path):
         model = AutoModelForCausalLM.from_config(config)
         model = model.eval()
         layers = find_layers(model)
-        for name in ['lm_head', 'embed_out',]:
+        for name in ['lm_head', 'embed_out']:
             if name in layers:
                 del layers[name]
         make_quant_for_4bit_autograd(model, layers, groupsize=shared.args.groupsize, is_v1_model=shared.args.v1)
