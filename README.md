@@ -113,18 +113,21 @@ python server.py --model llama-30b-4bit-128g --chat --autograd --groupsize 128  
 
 ### One-click installers
 
-[oobabooga-windows.zip](https://github.com/oobabooga/text-generation-webui/releases/download/installers/oobabooga-windows.zip)
+[oobabooga-windows.zip](https://github.com/oobabooga/text-generation-webui/releases/download/installers/oobabooga_windows.zip)
 
-Just download the zip above, extract it, and double click on "install". The web UI and all its dependencies will be installed in the same folder.
+[oobabooga-linux.zip](https://github.com/oobabooga/text-generation-webui/releases/download/installers/oobabooga_linux.zip)
 
-* To download a model, double click on "download-model"
-* To start the web UI, double click on "start-webui" 
+[oobabooga-macos.zip](https://github.com/oobabooga/text-generation-webui/releases/download/installers/oobabooga_macos.zip)
+
+Just download the zip above, extract it, and double click on "start". The web UI and all its dependencies will be installed in the same folder.
 
 Source codes: https://github.com/oobabooga/one-click-installers
 
 > **Note**
 > 
 > Thanks to [@jllllll](https://github.com/jllllll) and [@ClayShoaf](https://github.com/ClayShoaf), the Windows 1-click installer now sets up 8-bit and 4-bit requirements out of the box. No additional installation steps are necessary.
+>
+> Thanks to [@xNul](https://github.com/xNul), Linux and MacOS installers are now also available.
 
 > **Note**
 > 
@@ -377,15 +380,14 @@ Check the [wiki](https://github.com/oobabooga/text-generation-webui/wiki/System-
 
 ## Contributing
 
-Contributions to this project are welcome.
+Pull requests, suggestions, and issue reports are welcome. 
 
-| Way to contribute | Tier |
-|-----------------|-------------|
-| Submit a pull request that fixes a problem or adds a new feature. | ⭐⭐⭐⭐⭐ |
-| Test and review an open pull request. | ⭐⭐⭐⭐⭐ |
-| Submit a bug report after searching to make sure that it has not been reported before. | ⭐⭐⭐⭐ |
-| Submit a feature request that you think is relevant. | ⭐⭐⭐⭐ |
-| Submit a duplicate bug report. | 🥲 |
+You are also welcome to review open pull requests.
+
+Before reporting a bug, make sure that you have:
+
+1. Created a conda environment and installed the dependencies exactly as in the *Installation* section above.
+2. [Searched](https://github.com/oobabooga/text-generation-webui/issues) to see if an issue already exists for the issue you encountered.
 
 ## Credits
 
