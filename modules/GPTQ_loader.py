@@ -22,6 +22,16 @@ from gptq_llama import llama_inference_offload
 #from offload import load_quant_offload
 from modelutils import find_layers
 
+import time
+from colorama import init, Fore, Back, Style
+from transformers import AutoConfig, AutoModelForCausalLM
+
+import autograd_4bit
+from autograd_4bit import Autograd4bitQuantLinear, make_quant_for_4bit_autograd
+
+
+
+
 try:
     from quant import make_quant
     is_triton = False
@@ -29,6 +39,7 @@ except ImportError:
     import quant
     is_triton = True
 
+#Calculates max memory from arguments
 def calculate_device_mem ():
     if shared.args.gpu_memory or torch.cuda.device_count() > 1:
         if shared.args.gpu_memory:
@@ -42,9 +53,66 @@ def calculate_device_mem ():
             max_memory = accelerate.utils.get_balanced_memory(model)
     return max_memory
 
+#Autograd Loader to load the model with offloading or not.
+def load_autograd (config_path, model_path):
+
+
+    print(Style.BRIGHT + Fore.CYAN + "Autograd Loading Model ...")
+    t0 = time.time()
+
+    with accelerate.init_empty_weights():
+        config = AutoConfig.from_pretrained(config_path)
+        model = AutoModelForCausalLM.from_config(config)
+        model = model.eval()
+        layers = find_layers(model)
+        for name in ['lm_head', 'embed_out',]:
+            if name in layers:
+                del layers[name]
+        make_quant_for_4bit_autograd(model, layers, groupsize=shared.args.groupsize, is_v1_model=shared.args.v1)
+
+
+    if shared.args.gpu_memory or torch.cuda.device_count() > 1:
+        print(Style.BRIGHT + Fore.YELLOW + 'Autograd Dispatching model ...')
+        # rotary_emb fix
+        for n, m in model.named_modules():
+            if 'rotary_emb' in n:
+                cos_cached = m.cos_cached.clone().cpu()
+                sin_cached = m.sin_cached.clone().cpu()
+                break
+        
+        device_map = accelerate.infer_auto_device_map(model, max_memory=calculate_device_mem(), no_split_module_classes=["LlamaDecoderLayer", "GPTJBlock", "OPTDecoderLayer", "GPTNeoXLayer"])
+        print("Using the following device map for the quantized model:", device_map)      
+        accelerate.load_checkpoint_in_model(model, checkpoint=model_path, device_map=device_map)
+        model = accelerate.dispatch_model(model, device_map=device_map, offload_buffers=True, main_device=0)
+        torch.cuda.empty_cache()
+        print(Style.BRIGHT + Fore.YELLOW + 'Total {:.2f} Gib VRAM used.'.format(torch.cuda.memory_allocated() / 1024 / 1024))
+        # rotary_emb fix
+        for n, m in model.named_modules():
+            if 'rotary_emb' in n:
+                if getattr(m, '_hf_hook', None):
+                    if isinstance(m._hf_hook, accelerate.hooks.SequentialHook):
+                        hooks = m._hf_hook.hooks
+                    else:
+                        hooks = [m._hf_hook]
+                    for hook in hooks:
+                        if hook.offload:
+                            if n + '.sin_cached' not in hook.weights_map.dataset.state_dict.keys():
+                                hook.weights_map.dataset.state_dict[n + '.sin_cached'] = sin_cached.clone().cpu()
+                                hook.weights_map.dataset.state_dict[n + '.cos_cached'] = cos_cached.clone().cpu()      
+    else: 
+        device_map="auto"
+        print("Using the following device map for the quantized model:", device_map)
+        model = accelerate.load_checkpoint_and_dispatch(
+            model=model,
+            checkpoint=model_path,
+            device_map=device_map
+        )
+    print(Style.BRIGHT + Fore.GREEN + f"Loaded the model in {(time.time()-t0):.2f} seconds.")
+    return model
+
+#Autograd finalizer
 def finalize_autograd (model):
-    import autograd_4bit
-    from autograd_4bit import Autograd4bitQuantLinear
+
     from amp_wrapper import AMPWrapper
     model.half()
     for n, m in model.named_modules():
@@ -53,12 +121,10 @@ def finalize_autograd (model):
               m.zeros = m.zeros.half()
           m.scales = m.scales.half()
           m.bias = m.bias.half()
-    autograd_4bit.use_new = True
-    autograd_4bit.auto_switch = True
     wrapper = AMPWrapper(model)
     wrapper.apply_generate()
 
-    print('Apply auto switch and half. Lora:', shared.lora_names)
+    print(Style.BRIGHT + Fore.RED + 'Finalizing Autograd Lora:', shared.lora_names)
 
 
 # This function is a replacement for the load_quant function in the
@@ -208,26 +274,14 @@ def load_quantized(model_name):
     else:
         print(f"Found the following quantized model: {pt_path}")
 
+    # Autograd Model Load
     if shared.args.autograd:
-      import autograd_4bit
-      from autograd_4bit import Autograd4bitQuantLinear
-      from autograd_4bit import load_llama_model_4bit_low_ram, load_auto_model_4bit_low_ram, load_llama_model_4bit_low_ram_and_offload, load_auto_model_4bit_low_ram_and_offload
-      if (model_type== 'llama'):
-         if shared.args.gpu_memory or torch.cuda.device_count() > 1:         
-            model, tokenizer = load_llama_model_4bit_low_ram_and_offload(str(path_to_model), str(pt_path), lora_path=None, groupsize=shared.args.groupsize, seqlen=2048, max_memory=calculate_device_mem(), is_v1_model=shared.args.v1)  
-         else:
-            model, tokenizer = load_llama_model_4bit_low_ram(path_to_model, str(pt_path), groupsize=shared.args.groupsize, is_v1_model=shared.args.v1)
-          
-      else:
-         if shared.args.gpu_memory or torch.cuda.device_count() > 1:
-            model, tokenizer = load_auto_model_4bit_low_ram_and_offload(str(path_to_model), str(pt_path), lora_path=None, groupsize=shared.args.groupsize, seqlen=2048, max_memory=calculate_device_mem(), is_v1_model=shared.args.v1)                   
-         else:
-            model, tokenizer = load_auto_model_4bit_low_ram(str(path_to_model), str(pt_path), groupsize=shared.args.groupsize, is_v1_model=shared.args.v1)
+       model = load_autograd ( str(path_to_model), str(pt_path)) 
 
-      if not shared.args.lora or len(shared.lora_names) == 0:
-         finalize_autograd(model)
-         print('Finalizing In loader')   
-      return model #let textgen handle the tokenizer
+       if not shared.args.lora or len(shared.lora_names) == 0:
+          finalize_autograd(model)
+          print(Style.BRIGHT + Fore.GREEN + 'No Lora. Finalized in loader...')   
+       return model #let textgen handle the tokenizer
 
     # qwopqwop200's offload 
     elif model_type == 'llama' and shared.args.pre_layer:
