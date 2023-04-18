@@ -121,17 +121,9 @@ python server.py --model llama-30b-4bit-128g --chat --autograd --groupsize 128  
 
 Just download the zip above, extract it, and double click on "start". The web UI and all its dependencies will be installed in the same folder.
 
-Source codes: https://github.com/oobabooga/one-click-installers
-
-> **Note**
-> 
-> Thanks to [@jllllll](https://github.com/jllllll) and [@ClayShoaf](https://github.com/ClayShoaf), the Windows 1-click installer now sets up 8-bit and 4-bit requirements out of the box. No additional installation steps are necessary.
->
-> Thanks to [@xNul](https://github.com/xNul), Linux and MacOS installers are now also available.
-
-> **Note**
-> 
-> There is no need to run the installer as admin.
+* The source codes are here: https://github.com/oobabooga/one-click-installers
+* Huge thanks to [@jllllll](https://github.com/jllllll), [@ClayShoaf](https://github.com/ClayShoaf), and [@xNul](https://github.com/xNul) for their contributions to these installers.
+* There is no need to run the installers as admin.
 
 ### Manual installation using Conda
 
@@ -203,13 +195,13 @@ As an alternative to the recommended WSL method, you can install the web UI nati
 ### Alternative: Docker
 
 ```
-cp .env.example .env
+ln -s docker/{Dockerfile,docker-compose.yml,.dockerignore} .
+cp docker/.env.example .env
+# Edit .env and set TORCH_CUDA_ARCH_LIST based on your GPU model
 docker compose up --build
 ```
 
-Make sure to edit `.env.example` and set the appropriate CUDA version for your GPU, which can be found on [developer.nvidia.com](https://developer.nvidia.com/cuda-gpus).
-
-You need to have docker compose v2.17 or higher installed in your system. For installation instructions, see [Docker compose installation](https://github.com/oobabooga/text-generation-webui/wiki/Docker-compose-installation).
+You need to have docker compose v2.17 or higher installed in your system. To see how to install docker compose itself, see the guide in https://github.com/oobabooga/text-generation-webui/tree/main/docker.
 
 Contributed by [@loeken](https://github.com/loeken) in [#633](https://github.com/oobabooga/text-generation-webui/pull/633)
 
