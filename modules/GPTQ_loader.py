@@ -12,9 +12,13 @@ from transformers import AutoConfig, AutoModelForCausalLM
 
 sys.path.insert(0, str(Path("repositories/GPTQ-Merged/src/alpaca_lora_4bit")))
 sys.path.insert(0, str(Path("repositories/GPTQ-Merged/src/gptq_llama")))
+#sys.path.insert(0, str(Path("repositories/GPTQ-for-LLaMa")))
+
+
 
 #from gptq_llama import quant, modelutils
-from gptq_llama import llama_inference_offload 
+from gptq_llama import llama_inference_offload
+#import llama_inference_offload 
 #from offload import load_quant_offload
 from modelutils import find_layers
 
@@ -41,6 +45,8 @@ def calculate_device_mem ():
 def finalize_autograd (model):
     import autograd_4bit
     from autograd_4bit import Autograd4bitQuantLinear
+    from amp_wrapper import AMPWrapper
+    model.half()
     for n, m in model.named_modules():
        if isinstance(m, Autograd4bitQuantLinear):
           if (shared.args.v1 == True):
@@ -49,6 +55,8 @@ def finalize_autograd (model):
           m.bias = m.bias.half()
     autograd_4bit.use_new = True
     autograd_4bit.auto_switch = True
+    wrapper = AMPWrapper(model)
+    wrapper.apply_generate()
 
     print('Apply auto switch and half. Lora:', shared.lora_names)
 
@@ -119,9 +127,10 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
     model.seqlen = 2048
     print('Done.')
     
-    #from amp_wrapper import AMPWrapper
-    #wrapper = AMPWrapper(model)
-    #wrapper.apply_generate()
+#    from amp_wrapper import AMPWrapper
+#    model.half()
+#    wrapper = AMPWrapper(model)
+#    wrapper.apply_generate()
 
 
     return model
