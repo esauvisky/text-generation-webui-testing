@@ -5,7 +5,7 @@
 - Allow 4bit loras and use of the --autograd implementation.
 - Use GPT-J 4-bits (GPTQv1/v2)
 - GPT-NeoXT 4-bits (GPTQv1/v2)
-- 8 bit threshold hardcoded to 1.5 for now (Pre 7.0 compute)
+- 8 bit threshold slider, default 1.5 (pre compute 7.0)
 - load 4-bit lora from web ui
 - V1 Models work in --autograd (declare with --v1)
 - V2 Models work in both.
