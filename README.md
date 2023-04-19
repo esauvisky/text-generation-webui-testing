@@ -96,7 +96,7 @@ python server.py --model llama-30b-4bit-128g --chat --autograd --groupsize 128  
 * Dropdown menu for switching between models
 * Notebook mode that resembles OpenAI's playground
 * Chat mode for conversation and role playing
-* Instruct mode compatible with Alpaca, Vicuna, Open Assistant, Dolly, Koala, and ChatGLM formats **\*NEW!\***
+* Instruct mode compatible with Alpaca, Vicuna, Open Assistant, Dolly, Koala, and ChatGLM formats 
 * Nice HTML output for GPT-4chan
 * Markdown output for [GALACTICA](https://github.com/paperswithcode/galai), including LaTeX rendering
 * [Custom chat characters](https://github.com/oobabooga/text-generation-webui/wiki/Custom-chat-characters)
@@ -111,7 +111,7 @@ python server.py --model llama-30b-4bit-128g --chat --autograd --groupsize 128  
 * API [with](https://github.com/oobabooga/text-generation-webui/blob/main/api-example-stream.py) streaming and [without](https://github.com/oobabooga/text-generation-webui/blob/main/api-example.py) streaming
 * [LLaMA model](https://github.com/oobabooga/text-generation-webui/wiki/LLaMA-model)
 * [4-bit GPTQ mode](https://github.com/oobabooga/text-generation-webui/wiki/GPTQ-models-(4-bit-mode))
-* [llama.cpp](https://github.com/oobabooga/text-generation-webui/wiki/llama.cpp-models) **\*NEW!\***
+* [llama.cpp](https://github.com/oobabooga/text-generation-webui/wiki/llama.cpp-models)
 * [RWKV model](https://github.com/oobabooga/text-generation-webui/wiki/RWKV-model)
 * [LoRA (loading and training)](https://github.com/oobabooga/text-generation-webui/wiki/Using-LoRAs)
 * Softprompts
