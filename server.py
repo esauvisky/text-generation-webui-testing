@@ -348,7 +348,7 @@ def create_model_menus():
                         shared.gradio['cpu'] = gr.Checkbox(label="cpu", value=shared.args.cpu)
                         shared.gradio['bf16'] = gr.Checkbox(label="bf16", value=shared.args.bf16)
                         shared.gradio['load_in_8bit'] = gr.Checkbox(label="load-in-8bit", value=shared.args.load_in_8bit)
-                        shared.gradio['threshold'] = gr.Slider(label="8bit threshold", minimum=0, maximum=10, value=shared.args.threshold)
+                        shared.gradio['threshold'] = gr.Slider(label="8bit threshold", minimum=0.0, maximum=10.0, value=shared.args.threshold)
 
 
         with gr.Column():
@@ -620,15 +620,10 @@ def create_interface():
                             shared.gradio['html'] = gr.HTML()
 
                         with gr.Row():
-                            with gr.Column():
-                                with gr.Row():
-                                    shared.gradio['Generate'] = gr.Button('Generate', variant='primary')
-                                    shared.gradio['Stop'] = gr.Button('Stop')
-                                    shared.gradio['Undo'] = gr.Button('Undo')
-                                    shared.gradio['Regenerate'] = gr.Button('Regenerate')
-
-                            with gr.Column():
-                                pass
+                            shared.gradio['Generate'] = gr.Button('Generate', variant='primary', elem_classes="small-button")
+                            shared.gradio['Stop'] = gr.Button('Stop', elem_classes="small-button")
+                            shared.gradio['Undo'] = gr.Button('Undo', elem_classes="small-button")
+                            shared.gradio['Regenerate'] = gr.Button('Regenerate', elem_classes="small-button")
 
                     with gr.Column(scale=1):
                         gr.HTML('<div style="padding-bottom: 13px"></div>')
