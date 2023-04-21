@@ -15,6 +15,7 @@
 - Probably not as fast as the old version (still figuring this out)
 - 4bit loras only work in autograd
 - Only load one 4bit lora at a time and apply with no loras before switch.
+- Train 4-bit loras (new)
 
 
 #### Depends on:
