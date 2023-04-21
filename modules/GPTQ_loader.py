@@ -14,23 +14,21 @@ sys.path.insert(0, str(Path("repositories/GPTQ-Merged/src/alpaca_lora_4bit")))
 sys.path.insert(0, str(Path("repositories/GPTQ-Merged/src/gptq_llama")))
 #sys.path.insert(0, str(Path("repositories/GPTQ-for-LLaMa")))
 
-
-
 #from gptq_llama import quant, modelutils
 from gptq_llama import llama_inference_offload
 #import llama_inference_offload 
 #from offload import load_quant_offload
-from modelutils import find_layers
+
+try:
+    from modelutils import find_layers
+except ImportError:
+    from utils import find_layers
 
 import time
 from colorama import init, Fore, Back, Style
-from transformers import AutoConfig, AutoModelForCausalLM
 
 import autograd_4bit
 from autograd_4bit import Autograd4bitQuantLinear, make_quant_for_4bit_autograd
-
-
-
 
 try:
     from quant import make_quant
@@ -193,12 +191,6 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
     model.seqlen = 2048
     print('Done.')
     
-#    from amp_wrapper import AMPWrapper
-#    model.half()
-#    wrapper = AMPWrapper(model)
-#    wrapper.apply_generate()
-
-
     return model
 
 
