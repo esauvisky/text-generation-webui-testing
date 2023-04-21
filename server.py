@@ -348,7 +348,7 @@ def create_model_menus():
                         shared.gradio['cpu'] = gr.Checkbox(label="cpu", value=shared.args.cpu)
                         shared.gradio['bf16'] = gr.Checkbox(label="bf16", value=shared.args.bf16)
                         shared.gradio['load_in_8bit'] = gr.Checkbox(label="load-in-8bit", value=shared.args.load_in_8bit)
-                        shared.gradio['threshold'] = gr.Slider(label="8bit threshold", minimum=0, maximum=10, value=shared.args.threshold)
+                        shared.gradio['threshold'] = gr.Slider(label="8bit threshold", minimum=0.0, maximum=10.0, value=shared.args.threshold)
 
 
         with gr.Column():

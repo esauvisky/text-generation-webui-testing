@@ -128,9 +128,10 @@ def load_model(model_name):
             params["device_map"] = 'auto'
             params["trust_remote_code"] = trust_remote_code
             if shared.args.load_in_8bit and any((shared.args.auto_devices, shared.args.gpu_memory)):
-                params['quantization_config'] = BitsAndBytesConfig(load_in_8bit=True, llm_int8_threshold=shared.args.threshold, llm_int8_enable_fp32_cpu_offload=True)
+                params['quantization_config'] = BitsAndBytesConfig(load_in_8bit=True, llm_int8_threshold=float(shared.args.threshold), llm_int8_enable_fp32_cpu_offload=True)
             elif shared.args.load_in_8bit:
-                params['quantization_config'] = BitsAndBytesConfig(load_in_8bit=True, llm_int8_threshold=shared.args.threshold)
+                params['quantization_config'] = BitsAndBytesConfig(load_in_8bit=True, llm_int8_threshold=float(shared.args.threshold))
+                print('threshold: ', float(shared.args.threshold))
             elif shared.args.bf16:
                 params["torch_dtype"] = torch.bfloat16
             else:
