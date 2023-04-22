@@ -20,6 +20,7 @@ from gptq_llama import llama_inference_offload
 #from offload import load_quant_offload
 
 try:
+    from gptq_llama import modelutils
     from modelutils import find_layers
 except ImportError:
     from utils import find_layers
