@@ -166,7 +166,7 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
             make_quant_kwargs['kernel_switch_threshold'] = kernel_switch_threshold
 
         make_quant(**make_quant_kwargs)
-        print (make_quant_kwargs)
+        #print (make_quant_kwargs)
     else:
         quant.make_quant_linear(model, layers, wbits, groupsize)
 
