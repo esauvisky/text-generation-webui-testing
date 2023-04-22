@@ -112,7 +112,7 @@ def load_autograd (config_path, model_path):
 def finalize_autograd (model):
 
     from amp_wrapper import AMPWrapper
-    model.half()
+    model.half() #can't benchmark with lora
     for n, m in model.named_modules():
        if isinstance(m, Autograd4bitQuantLinear):
           if (shared.args.v1 == True):
@@ -121,7 +121,8 @@ def finalize_autograd (model):
           m.bias = m.bias.half()
     wrapper = AMPWrapper(model)
     wrapper.apply_generate()
-
+#    from model_attn_mlp_patch import make_quant_attn
+#    make_quant_attn(model)
     print(Style.BRIGHT + Fore.RED + 'Finalizing Autograd Lora:', shared.lora_names)
 
 
@@ -165,6 +166,7 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
             make_quant_kwargs['kernel_switch_threshold'] = kernel_switch_threshold
 
         make_quant(**make_quant_kwargs)
+        print (make_quant_kwargs)
     else:
         quant.make_quant_linear(model, layers, wbits, groupsize)
 
