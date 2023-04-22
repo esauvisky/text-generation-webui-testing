@@ -112,8 +112,7 @@ def load_autograd (config_path, model_path):
 
 #Autograd finalizer
 def finalize_autograd (model):
-
-    from amp_wrapper import AMPWrapper
+  
     model.half() #can't benchmark with lora
     for n, m in model.named_modules():
        if isinstance(m, Autograd4bitQuantLinear):
@@ -121,10 +120,17 @@ def finalize_autograd (model):
               m.zeros = m.zeros.half()
           m.scales = m.scales.half()
           m.bias = m.bias.half()
-    wrapper = AMPWrapper(model)
-    wrapper.apply_generate()
-#    from model_attn_mlp_patch import make_quant_attn
-#    make_quant_attn(model)
+
+    if (shared.args.mlp_attn):
+       from model_attn_mlp_patch import make_quant_attn, make_fused_mlp
+       make_quant_attn(model)
+       make_fused_mlp(model)
+       print(Style.BRIGHT + Fore.YELLOW + 'Todo: No loras with MLP yet')
+    else:
+       from amp_wrapper import AMPWrapper
+       wrapper = AMPWrapper(model)
+       wrapper.apply_generate()
+
     print(Style.BRIGHT + Fore.RED + 'Finalizing Autograd Lora:', shared.lora_names)
 
 

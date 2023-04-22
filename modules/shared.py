@@ -125,6 +125,7 @@ parser.add_argument('--groupsize', type=int, default=-1, help='GPTQ: Group size.
 parser.add_argument('--pre_layer', type=int, default=0, help='GPTQ: The number of layers to allocate to the GPU. Setting this parameter enables CPU offloading for 4-bit models.')
 parser.add_argument('--autograd', action='store_true', default=False, help='Use the autograd GPTQ loader for llama and llama lora')
 parser.add_argument('--v1', action='store_true', default=False, help='Explicity declare GPTQv1 Model to Autograd')
+parser.add_argument('--mlp_attn', action='store_true', help='MLP attention hijack. Slightly faster inference.')
 parser.add_argument('--no-quant_attn', action='store_true', help='GPTQ: Disable quant attention for triton. If you encounter incoherent results try disabling this.')
 parser.add_argument('--no-warmup_autotune', action='store_true', help='GPTQ: Disable warmup autotune for triton.')
 parser.add_argument('--no-fused_mlp', action='store_true', help='GPTQ: Disable fused mlp for triton. If you encounter "Unexpected mma -> mma layout conversion" try disabling this.')
