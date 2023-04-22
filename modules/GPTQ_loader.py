@@ -31,6 +31,7 @@ import autograd_4bit
 from autograd_4bit import Autograd4bitQuantLinear, make_quant_for_4bit_autograd
 
 try:
+    from gptq_llama import quant
     from quant import make_quant
     is_triton = False
 except ImportError:
