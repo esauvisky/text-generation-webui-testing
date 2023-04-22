@@ -23,6 +23,12 @@ https://github.com/Ph0rk0z/GPTQ-Merged (dual module branch)
 
 https://github.com/sterlind/peft
 
+4/22/23
+```
+New --mlp-attn, slightly faster on some contexts but no lora support added yet.
+both --xformers and --sdp-attention prevent the 30b from going OOM at full context.
+```
+
 4/18/23
 ```
 Using the patch for PEFT and no longer depends on PEFT fork.
