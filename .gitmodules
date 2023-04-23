@@ -12,4 +12,4 @@
 [submodule "extensions/bark_tts"]
 	path = extensions/bark_tts
 	url = https://github.com/wsippel/bark_tts
-
+    ignore = untracked
