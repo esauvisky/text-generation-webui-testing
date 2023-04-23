@@ -5,11 +5,11 @@
 [submodule "repositories/GPTQ-Merged"]
 	path = repositories/GPTQ-Merged
 	url = https://github.com/Ph0rk0z/GPTQ-Merged
-    branch = dual-model
+	branch = dual-model
 [submodule "extensions/long_term_memory"]
 	path = extensions/long_term_memory
 	url = https://github.com/wawawario2/long_term_memory
 [submodule "extensions/bark_tts"]
 	path = extensions/bark_tts
 	url = https://github.com/wsippel/bark_tts
-    ignore = untracked
+	ignore = untracked
