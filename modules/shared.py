@@ -6,11 +6,10 @@ import yaml
 model = None
 tokenizer = None
 model_name = "None"
+model_type = None
 lora_names = []
 soft_prompt_tensor = None
 soft_prompt = False
-is_RWKV = False
-is_llamacpp = False
 
 # Chat variables
 history = {'internal': [], 'visible': []}
@@ -126,9 +125,9 @@ parser.add_argument('--pre_layer', type=int, default=0, help='GPTQ: The number o
 parser.add_argument('--autograd', action='store_true', default=False, help='Use the autograd GPTQ loader for llama and llama lora')
 parser.add_argument('--v1', action='store_true', default=False, help='Explicity declare GPTQv1 Model to Autograd')
 parser.add_argument('--mlp_attn', action='store_true', help='MLP attention hijack. Slightly faster inference.')
-parser.add_argument('--no-quant_attn', action='store_true', help='GPTQ: Disable quant attention for triton. If you encounter incoherent results try disabling this.')
-parser.add_argument('--no-warmup_autotune', action='store_true', help='GPTQ: Disable warmup autotune for triton.')
-parser.add_argument('--no-fused_mlp', action='store_true', help='GPTQ: Disable fused mlp for triton. If you encounter "Unexpected mma -> mma layout conversion" try disabling this.')
+parser.add_argument('--quant_attn', action='store_true', help='(triton) Enable quant attention.')
+parser.add_argument('--warmup_autotune', action='store_true', help='(triton) Enable warmup autotune.')
+parser.add_argument('--fused_mlp', action='store_true', help='(triton) Enable fused mlp.')
 
 # FlexGen
 parser.add_argument('--flexgen', action='store_true', help='Enable the use of FlexGen offloading.')
@@ -154,6 +153,11 @@ parser.add_argument('--auto-launch', action='store_true', default=False, help='O
 parser.add_argument('--verbose', action='store_true', help='Print the prompts to the terminal.')
 parser.add_argument("--gradio-auth-path", type=str, help='Set the gradio authentication file path. The file should contain one or more user:password pairs in this format: "u1:p1,u2:p2,u3:p3"', default=None)
 
+# API
+parser.add_argument('--api', action='store_true', help='Enable the API extension.')
+parser.add_argument('--public-api', action='store_true', help='Create a public URL for the API using Cloudfare.')
+
+
 args = parser.parse_args()
 args_defaults = parser.parse_args([])
 
@@ -174,6 +178,13 @@ if args.trust_remote_code:
     print("Warning: trust_remote_code is enabled. This is dangerous.\n")
 if args.share:
     print("Warning: the gradio \"share link\" feature downloads a proprietary and\nunaudited blob to create a reverse tunnel. This is potentially dangerous.\n")
+
+# Activating the API extension
+if args.api or args.public_api:
+    if args.extensions is None:
+        args.extensions = ['api']
+    elif 'api' not in args.extensions:
+        args.extensions.append('api')
 
 
 def is_chat():
