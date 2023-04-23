@@ -2,8 +2,11 @@ cache
 characters
 training/datasets
 extensions/silero_tts/outputs
+extensions/silero_tts/outputs
 extensions/elevenlabs_tts/outputs
 extensions/sd_api_pictures/outputs
+extensions/bark_tts/outputs
+extensions/*/outputs
 logs
 loras
 models
