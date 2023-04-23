@@ -1,7 +1,7 @@
 [submodule "repositories/peft"]
 	path = repositories/peft
 	url = https://github.com/sterlind/peft
-    branch = main
+	branch = main
 [submodule "repositories/GPTQ-Merged"]
 	path = repositories/GPTQ-Merged
 	url = https://github.com/Ph0rk0z/GPTQ-Merged
