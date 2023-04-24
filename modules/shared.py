@@ -20,6 +20,9 @@ processing_message = '*Is typing...*'
 # UI elements (buttons, sliders, HTML, etc)
 gradio = {}
 
+# For keeping the values of UI elements on page reload
+persistent_interface_state = {}
+
 # Generation input parameters
 input_params = []
 
@@ -56,7 +59,7 @@ settings = {
     'chat_default_extensions': ["gallery"],
     'presets': {
         'default': 'Default',
-        '.*(alpaca|llama)': "LLaMA-Precise",
+        '.*(alpaca|llama|llava)': "LLaMA-Precise",
         '.*pygmalion': 'NovelAI-Storywriter',
         '.*RWKV': 'Naive',
     },
@@ -116,6 +119,7 @@ parser.add_argument('--trust-remote-code', action='store_true', help="Set trust_
 
 # llama.cpp
 parser.add_argument('--threads', type=int, default=0, help='Number of threads to use in llama.cpp.')
+parser.add_argument('--n_batch', type=int, default=8, help='Processing batch size for llama.cpp.')
 
 # GPTQ
 parser.add_argument('--wbits', type=int, default=0, help='GPTQ: Load a pre-quantized model with specified precision in bits. 2, 3, 4 and 8 are supported.')
