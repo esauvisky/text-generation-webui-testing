@@ -43,18 +43,19 @@ def add_lora_to_model(lora_names):
 
     from peft import PeftModel
 
-    # Nothing to do = skip.
+    # If no LoRA needs to be added or removed, exit
     if len(added_set) == 0 and len(removed_set) == 0:
         return
-      
-       # Only adding, and already peft? Do it the easy way.
+
+    # Add a LoRA when another LoRA is already present
     if len(removed_set) == 0 and len(prior_set) > 0:
         print(f"Adding the LoRA(s) named {added_set} to the model...")
         for lora in added_set:
             shared.model.load_adapter(Path(f"{shared.args.lora_dir}/{lora}"), lora)
-            return
 
-       # If removing anything, disable all and re-add.
+        return
+
+    # If any LoRA needs to be removed, start over
     if len(removed_set) > 0:
         shared.model.disable_adapter()
     #    if shared.args.autograd:
