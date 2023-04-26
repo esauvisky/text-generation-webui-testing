@@ -52,7 +52,10 @@ llama-[0-9]*b-4bit$:
   mode: 'instruct'
   model_type: 'llama'
   instruction_template: 'LLaVA'
+  custom_stopping_strings: '"\n###"'
 .*$:
   mode: 'cai-chat'
   instruction_template: 'None'
-
+.*raven:
+  mode: 'instruct'
+  instruction_template: 'RWKV-Raven'
