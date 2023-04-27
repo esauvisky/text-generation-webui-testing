@@ -75,14 +75,14 @@ def generate_chat_prompt(user_input, state, **kwargs):
 
     if impersonate:
         min_rows = 2
-        rows.append(user_turn_stripped)
+        rows.append(user_turn_stripped.rstrip(' '))
     elif not _continue:
         # Adding the user message
         if len(user_input) > 0:
             rows.append(replace_all(user_turn, {'<|user-message|>': user_input.strip(), '<|round|>': str(len(shared.history["internal"]))}))
 
         # Adding the Character prefix
-        rows.append(apply_extensions("bot_prefix", bot_turn_stripped))
+        rows.append(apply_extensions("bot_prefix", bot_turn_stripped.rstrip(' ')))
 
     while len(rows) > min_rows and len(encode(''.join(rows))[0]) >= max_length:
         rows.pop(1)
