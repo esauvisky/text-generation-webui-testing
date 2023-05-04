@@ -181,7 +181,7 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
 
     del layers
 
-    print('Loading GPTQ model ...')
+    logging.warning('Loading GPTQ model ...')
     if checkpoint.endswith('.safetensors'):
         from safetensors.torch import load_file as safe_load
         model.load_state_dict(safe_load(checkpoint), strict=False)
@@ -200,7 +200,6 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
                 quant.autotune_warmup_fused(model)
 
     model.seqlen = 2048
-    print('Done.')
     
     return model
 
