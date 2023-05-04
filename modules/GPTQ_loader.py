@@ -1,4 +1,5 @@
 import inspect
+import logging
 import re
 import sys
 from pathlib import Path
@@ -101,7 +102,7 @@ def load_autograd (config_path, model_path):
                                 hook.weights_map.dataset.state_dict[n + '.cos_cached'] = cos_cached.clone().cpu()      
     else: 
         device_map="auto"
-        print("Using the following device map for the quantized model:", device_map)
+        logging.info("Using the following device map for the quantized model:", device_map)
         model = accelerate.load_checkpoint_and_dispatch(
             model=model,
             checkpoint=model_path,
@@ -180,7 +181,7 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
 
     del layers
 
-    print('Loading GPTQ model ...')
+    logging.warning('Loading GPTQ model ...')
     if checkpoint.endswith('.safetensors'):
         from safetensors.torch import load_file as safe_load
         model.load_state_dict(safe_load(checkpoint), strict=False)
@@ -199,7 +200,6 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
                 quant.autotune_warmup_fused(model)
 
     model.seqlen = 2048
-    print('Done.')
     
     return model
 
@@ -228,11 +228,13 @@ def find_quantized_model_file(model_name):
 
         if len(found_pts) > 0:
             if len(found_pts) > 1:
-                print('Warning: more than one .pt model has been found. The last one will be selected. It could be wrong.')
+                logging.warning('More than one .pt model has been found. The last one will be selected. It could be wrong.')
+
             pt_path = found_pts[-1]
         elif len(found_safetensors) > 0:
             if len(found_pts) > 1:
-                print('Warning: more than one .safetensors model has been found. The last one will be selected. It could be wrong.')
+                logging.warning('More than one .safetensors model has been found. The last one will be selected. It could be wrong.')
+
             pt_path = found_safetensors[-1]
 
     return pt_path
@@ -253,8 +255,7 @@ def load_quantized(model_name):
         elif any((k in name for k in ['oasst', 'pythia-12b', 'lotus-12b', 'gpt-neoxt'])):
             model_type = 'gptneox'
         else:
-            print("Can't determine model type from model name. Please specify it manually using --model_type "
-                  "argument")
+            logging.error("Can't determine model type from model name. Please specify it manually using --model_type argument")
             exit()
     else:
         model_type = shared.args.model_type.lower()
@@ -264,17 +265,21 @@ def load_quantized(model_name):
         load_quant = llama_inference_offload.load_quant
     elif model_type in ('llama', 'opt', 'gptneox', 'gptj'):
         if shared.args.pre_layer:
-            print("Warning: ignoring --pre_layer because it only works for llama model type.")
+            logging.warning("Ignoring --pre_layer because it only works for llama model type.")
+
         load_quant = _load_quant
+    else:
+        logging.error("Unknown pre-quantized model type specified. Only 'llama', 'opt' and 'gptj' are supported")
+        exit()
 
     # Find the quantized model weights file (.pt/.safetensors)
     path_to_model = Path(f'{shared.args.model_dir}/{model_name}')
     pt_path = find_quantized_model_file(model_name)
     if not pt_path:
-        print(f"Could not find {pt_model}, exiting...")
+        logging.error("Could not find {pt_model}, the quantized model in .pt or .safetensors format, exiting...")
         exit()
     else:
-        print(f"Found the following quantized model: {pt_path}")
+        logging.info(f"Found the following quantized model: {pt_path}")
 
     # Autograd Model Load
     if shared.args.autograd:
@@ -295,7 +300,7 @@ def load_quantized(model_name):
         # accelerate offload (doesn't work properly)
         if shared.args.gpu_memory or torch.cuda.device_count() > 1:
             device_map = accelerate.infer_auto_device_map(model, max_memory=calculate_device_mem(), no_split_module_classes=["LlamaDecoderLayer", "GPTJBlock", "OPTDecoderLayer", "GPTNeoXLayer"])
-            print("Using the following device map for the quantized model:", device_map)
+            logging.info("Using the following device map for the quantized model:", device_map)
             # https://huggingface.co/docs/accelerate/package_reference/big_modeling#accelerate.dispatch_model
             model = accelerate.dispatch_model(model, device_map=device_map, offload_buffers=True)
 
