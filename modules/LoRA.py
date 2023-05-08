@@ -63,6 +63,8 @@ def add_lora_to_model(lora_names):
     #       from modules.models import reload_model
     #       reload_model() #remove lora
     
+        shared.model = shared.model.base_model.model
+
 
     if len(lora_names) > 0:
         logging.info("Applying the following LoRAs to {}: {}".format(shared.model_name, ', '.join(lora_names)))

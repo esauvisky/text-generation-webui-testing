@@ -54,6 +54,8 @@ def find_model_type(model_name):
         return 'galactica'
     elif 'llava' in model_name_lower:
         return 'llava'
+    elif 'oasst' in model_name_lower:
+        return 'oasst'
     elif any((k in model_name_lower for k in ['gpt4chan', 'gpt-4chan'])):
         return 'gpt4chan'
     else:
@@ -191,9 +193,9 @@ def load_model(model_name):
 
         checkpoint = Path(f'{shared.args.model_dir}/{model_name}')
         if shared.args.load_in_8bit and params.get('max_memory', None) is not None and params['device_map'] == 'auto':
-            config = AutoConfig.from_pretrained(checkpoint)
+            config = AutoConfig.from_pretrained(checkpoint, trust_remote_code=trust_remote_code)
             with init_empty_weights():
-                model = LoaderClass.from_config(config)
+                model = LoaderClass.from_config(config, trust_remote_code=trust_remote_code)
 
             model.tie_weights()
             params['device_map'] = infer_auto_device_map(
@@ -217,7 +219,7 @@ def load_model(model_name):
         tokenizer = None
 
         # Try to load an universal LLaMA tokenizer
-        if shared.model_type != 'llava':
+        if shared.model_type not in ['llava', 'oasst']:
             for p in [Path(f"{shared.args.model_dir}/llama-tokenizer/"), Path(f"{shared.args.model_dir}/oobabooga_llama-tokenizer/")]:
                 if p.exists():
                     logging.info(f"Loading the universal LLaMA tokenizer from {p}...")
