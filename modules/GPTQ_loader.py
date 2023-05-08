@@ -142,7 +142,7 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
     def noop(*args, **kwargs):
         pass
 
-    config = AutoConfig.from_pretrained(model)
+    config = AutoConfig.from_pretrained(model, trust_remote_code=shared.args.trust_remote_code)
     torch.nn.init.kaiming_uniform_ = noop
     torch.nn.init.uniform_ = noop
     torch.nn.init.normal_ = noop
@@ -150,7 +150,7 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
     torch.set_default_dtype(torch.half)
     transformers.modeling_utils._init_weights = False
     torch.set_default_dtype(torch.half)
-    model = AutoModelForCausalLM.from_config(config)
+    model = AutoModelForCausalLM.from_config(config, trust_remote_code=shared.args.trust_remote_code)
     torch.set_default_dtype(torch.float)
     if eval:
         model = model.eval()
@@ -206,6 +206,9 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
 
 # Used to locate the .pt/.safetensors quantized file
 def find_quantized_model_file(model_name):
+    if shared.args.checkpoint:
+        return Path(shared.args.checkpoint)
+
     path_to_model = Path(f'{shared.args.model_dir}/{model_name}')
     pt_path = None
     priority_name_list = [

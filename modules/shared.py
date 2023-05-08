@@ -49,7 +49,8 @@ settings = {
     'truncation_length': 2048,
     'truncation_length_min': 0,
     'truncation_length_max': 8192,
-    'mode': 'cai-chat',
+    'mode': 'chat',
+    'chat_style': 'cai-chat',
     'instruction_template': 'None',
     'chat_prompt_size': 2048,
     'chat_prompt_size_min': 0,
@@ -64,6 +65,7 @@ settings = {
         '.*(alpaca|llama|llava)': "LLaMA-Precise",
         '.*pygmalion': 'NovelAI-Storywriter',
         '.*RWKV': 'Naive',
+        '.*moss': 'MOSS',
     },
     'prompts': {
         'default': 'QA',
@@ -94,7 +96,6 @@ parser = argparse.ArgumentParser(formatter_class=lambda prog: argparse.HelpForma
 # Basic settings
 parser.add_argument('--notebook', action='store_true', help='Launch the web UI in notebook mode, where the output is written to the same text box as the input.')
 parser.add_argument('--chat', action='store_true', help='Launch the web UI in chat mode with a style similar to the Character.AI website.')
-parser.add_argument('--cai-chat', action='store_true', help='DEPRECATED: use --chat instead.')
 parser.add_argument('--character', type=str, help='The name of the character to load in chat mode by default.')
 parser.add_argument('--model', type=str, help='Name of the model to load by default.')
 parser.add_argument('--lora', type=str, nargs="+", help='The list of LoRAs to load. If you want to load more than one LoRA, write the names separated by spaces.')
@@ -131,6 +132,7 @@ parser.add_argument('--wbits', type=int, default=0, help='GPTQ: Load a pre-quant
 parser.add_argument('--model_type', type=str, help='GPTQ: Model type of pre-quantized model. Currently LLaMA, OPT, and GPT-J are supported.')
 parser.add_argument('--groupsize', type=int, default=-1, help='GPTQ: Group size.')
 parser.add_argument('--pre_layer', type=int, default=0, help='GPTQ: The number of layers to allocate to the GPU. Setting this parameter enables CPU offloading for 4-bit models.')
+parser.add_argument('--checkpoint', type=str, help='The path to the quantized checkpoint file. If not specified, it will be automatically detected.')
 parser.add_argument('--autograd', action='store_true', default=False, help='Use the autograd GPTQ loader for llama and llama lora')
 parser.add_argument('--v1', action='store_true', default=False, help='Explicity declare GPTQv1 Model to Autograd')
 parser.add_argument('--mlp_attn', action='store_true', help='MLP attention hijack. Slightly faster inference.')
@@ -176,11 +178,6 @@ for k in deprecated_dict:
     if getattr(args, k) != deprecated_dict[k][1]:
         logging.warning(f"--{k} is deprecated and will be removed. Use --{deprecated_dict[k][0]} instead.")
         setattr(args, deprecated_dict[k][0], getattr(args, k))
-
-# Deprecation warnings for parameters that have been removed
-if args.cai_chat:
-    logging.warning("--cai-chat is deprecated. Use --chat instead.")
-    args.chat = True
 
 # Security warnings
 if args.trust_remote_code:
