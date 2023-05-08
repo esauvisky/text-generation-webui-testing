@@ -102,7 +102,7 @@ def load_autograd (config_path, model_path):
                                 hook.weights_map.dataset.state_dict[n + '.cos_cached'] = cos_cached.clone().cpu()      
     else: 
         device_map="auto"
-        logging.info("Using the following device map for the quantized model:", device_map)
+        print("Using the following device map for the quantized model:", device_map)
         model = accelerate.load_checkpoint_and_dispatch(
             model=model,
             checkpoint=model_path,
