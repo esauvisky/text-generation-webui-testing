@@ -124,8 +124,8 @@ def finalize_autograd (model):
 
     if (shared.args.mlp_attn):
        from model_attn_mlp_patch import make_quant_attn, make_fused_mlp
-       make_quant_attn(model)
-       make_fused_mlp(model)
+       make_quant_attn(model, shared.args.v1)
+       make_fused_mlp(model,shared.args.v1)
        print(Style.BRIGHT + Fore.YELLOW + 'Todo: No loras with MLP yet')
     else:
        from amp_wrapper import AMPWrapper
