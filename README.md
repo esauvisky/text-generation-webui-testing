@@ -23,6 +23,13 @@ https://github.com/Ph0rk0z/GPTQ-Merged (dual module branch)
 
 https://github.com/sterlind/peft
 
+5/8/23
+```
+I think autograd problem is fixed.. equal or faster than GPTQ
+Update the submodules git submodule update --recursive --remote
+```
+
+
 4/22/23
 ```
 New --mlp-attn, slightly faster on some contexts but no lora support added yet.
