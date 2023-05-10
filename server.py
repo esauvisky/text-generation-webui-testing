@@ -48,20 +48,27 @@ from modules import chat, shared, training, ui, utils
 from modules.html_generator import chat_html_wrapper
 from modules.LoRA import add_lora_to_model
 from modules.models import load_model, load_soft_prompt, unload_model
-from modules.text_generation import encode, generate_reply, stop_everything_event
+from modules.text_generation import generate_reply, get_encoded_length, stop_everything_event
 
 
-def load_model_wrapper(selected_model):
-    try:
-        yield f"Loading {selected_model}..."
-        shared.model_name = selected_model
-        unload_model()
-        if selected_model != '':
-            shared.model, shared.tokenizer = load_model(shared.model_name)
+def load_model_wrapper(selected_model, autoload=False):
+    if not autoload:
+        yield f"The settings for {selected_model} have been updated.\nClick on \"Load the model\" to load it."
+        return
 
-        yield f"Successfully loaded {selected_model}"
-    except:
-        yield traceback.format_exc()
+    if selected_model == 'None':
+        yield "No model selected"
+    else:
+        try:
+            yield f"Loading {selected_model}..."
+            shared.model_name = selected_model
+            unload_model()
+            if selected_model != '':
+                shared.model, shared.tokenizer = load_model(shared.model_name)
+
+            yield f"Successfully loaded {selected_model}"
+        except:
+            yield traceback.format_exc()
 
 
 def load_lora_wrapper(selected_loras):
@@ -124,6 +131,22 @@ def save_prompt(text):
 def load_prompt(fname):
     if fname in ['None', '']:
         return ''
+    elif fname.startswith('Instruct-'):
+        fname = re.sub('^Instruct-', '', fname)
+        with open(Path(f'characters/instruction-following/{fname}.yaml'), 'r', encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+            output = ''
+            if 'context' in data:
+                output += data['context']
+
+            replacements = {
+                '<|user|>': data['user'],
+                '<|bot|>': data['bot'],
+                '<|user-message|>': 'Input',
+            }
+
+            output += utils.replace_all(data['turn_template'].split('<|bot-message|>')[0], replacements)
+            return output
     else:
         with open(Path(f'prompts/{fname}.txt'), 'r', encoding='utf-8') as f:
             text = f.read()
@@ -133,7 +156,7 @@ def load_prompt(fname):
 
 
 def count_tokens(text):
-    tokens = len(encode(text)[0])
+    tokens = get_encoded_length(text)
     return f'{tokens} tokens in the input.'
 
 
@@ -293,6 +316,7 @@ def create_model_menus():
             with gr.Row():
                 shared.gradio['lora_menu_apply'] = gr.Button(value='Apply the selected LoRAs')
             with gr.Row():
+                load = gr.Button("Load the model", visible=not shared.settings['autoload_model'])
                 unload = gr.Button("Unload the model")
                 reload = gr.Button("Reload the model")
                 save_settings = gr.Button("Save settings for this model")
@@ -332,6 +356,9 @@ def create_model_menus():
 
     with gr.Row():
         with gr.Column():
+            with gr.Row():
+                shared.gradio['autoload_model'] = gr.Checkbox(value=shared.settings['autoload_model'], label='Autoload the model', info='Whether to load the model as soon as it is selected in the Model dropdown.')
+
             shared.gradio['custom_model_menu'] = gr.Textbox(label="Download custom model or LoRA", info="Enter the Hugging Face username/model path, for instance: facebook/galactica-125m. To specify a branch, add it at the end after a \":\" character like this: facebook/galactica-125m:main")
             shared.gradio['download_model_button'] = gr.Button("Download")
 
@@ -340,12 +367,20 @@ def create_model_menus():
 
     # In this event handler, the interface state is read and updated
     # with the model defaults (if any), and then the model is loaded
+    # unless "autoload_model" is unchecked
     shared.gradio['model_menu'].change(
         ui.gather_interface_values, [shared.gradio[k] for k in shared.input_elements], shared.gradio['interface_state']).then(
         load_model_specific_settings, [shared.gradio[k] for k in ['model_menu', 'interface_state']], shared.gradio['interface_state']).then(
         ui.apply_interface_values, shared.gradio['interface_state'], [shared.gradio[k] for k in ui.list_interface_input_elements(chat=shared.is_chat())], show_progress=False).then(
         update_model_parameters, shared.gradio['interface_state'], None).then(
-        load_model_wrapper, shared.gradio['model_menu'], shared.gradio['model_status'], show_progress=True)
+        load_model_wrapper, [shared.gradio[k] for k in ['model_menu', 'autoload_model']], shared.gradio['model_status'], show_progress=False)
+
+    load.click(
+        ui.gather_interface_values, [shared.gradio[k] for k in shared.input_elements], shared.gradio['interface_state']).then(
+        ui.apply_interface_values, shared.gradio['interface_state'],
+        [shared.gradio[k] for k in ui.list_interface_input_elements(chat=shared.is_chat())], show_progress=False).then(
+        update_model_parameters, shared.gradio['interface_state'], None).then(
+        partial(load_model_wrapper, autoload=True), shared.gradio['model_menu'], shared.gradio['model_status'], show_progress=False)
 
     unload.click(
         unload_model, None, None).then(
@@ -363,6 +398,7 @@ def create_model_menus():
 
     shared.gradio['lora_menu_apply'].click(load_lora_wrapper, shared.gradio['lora_menu'], shared.gradio['model_status'], show_progress=False)
     shared.gradio['download_model_button'].click(download_model_wrapper, shared.gradio['custom_model_menu'], shared.gradio['model_status'], show_progress=False)
+    shared.gradio['autoload_model'].change(lambda x: gr.update(visible=not x), shared.gradio['autoload_model'], load)
 
 
 def create_settings_menus(default_preset):
@@ -457,7 +493,7 @@ def create_interface():
     gen_events = []
     default_preset = shared.settings['presets'][next((k for k in shared.settings['presets'] if re.match(k.lower(), shared.model_name.lower())), 'default')]
     if len(shared.lora_names) == 1:
-        default_text = load_prompt(shared.settings['lora_prompts'][next((k for k in shared.settings['lora_prompts'] if re.match(k.lower(), shared.lora_names[0].lower())), 'default')])
+        default_text = load_prompt(shared.settings['prompts'][next((k for k in shared.settings['prompts'] if re.match(k.lower(), shared.lora_names[0].lower())), 'default')])
     else:
         default_text = load_prompt(shared.settings['prompts'][next((k for k in shared.settings['prompts'] if re.match(k.lower(), shared.model_name.lower())), 'default')])
     title = 'Text generation web UI'
@@ -719,6 +755,7 @@ def create_interface():
 
             gen_events.append(shared.gradio['Impersonate'].click(
                 ui.gather_interface_values, [shared.gradio[k] for k in shared.input_elements], shared.gradio['interface_state']).then(
+                lambda x: x, shared.gradio['textbox'], shared.gradio['Chat input'], show_progress=False).then(
                 chat.impersonate_wrapper, shared.input_params, shared.gradio['textbox'], show_progress=False)
             )
 

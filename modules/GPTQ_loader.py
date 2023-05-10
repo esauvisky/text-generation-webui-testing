@@ -8,6 +8,7 @@ import accelerate
 import torch
 import transformers
 import modules.shared as shared
+from server import get_model_specific_settings
 
 from transformers import AutoConfig, AutoModelForCausalLM
 
@@ -155,6 +156,7 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
     torch.set_default_dtype(torch.float)
     if eval:
         model = model.eval()
+
     layers = find_layers(model)
     for name in exclude_layers:
         if name in layers:
@@ -192,6 +194,7 @@ def _load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exc
     if is_triton:
         if shared.args.quant_attn:
             quant.make_quant_attn(model)
+
         if eval and shared.args.fused_mlp:
             quant.make_fused_mlp(model)
 
@@ -246,21 +249,15 @@ def find_quantized_model_file(model_name):
 
 # The function that loads the model in modules/models.py
 def load_quantized(model_name):
-
     # Find the model type
     if not shared.args.model_type:
-        name = model_name.lower()
-        if any((k in name for k in ['llama', 'alpaca', 'vicuna', 'llava'])):
-            model_type = 'llama'
-        elif any((k in name for k in ['opt-', 'galactica'])):
-            model_type = 'opt'
-        elif any((k in name for k in ['gpt-j', 'pygmalion-6b'])):
-            model_type = 'gptj'
-        elif any((k in name for k in ['oasst', 'pythia-12b', 'lotus-12b', 'gpt-neoxt'])):
-            model_type = 'gptneox'
+        settings = get_model_specific_settings(model_name)
+        if 'model_type' in settings and settings['model_type'] != 'None':
+            model_type = settings['model_type']
         else:
-            logging.error("Can't determine model type from model name. Please specify it manually using --model_type argument")
-            exit()
+            logging.error("The model could not be loaded because its type could not be inferred from its name.")
+            logging.error("Please specify the type manually using the --model_type argument.")
+            return
     else:
         model_type = shared.args.model_type.lower()
 
