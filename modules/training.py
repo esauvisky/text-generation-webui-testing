@@ -336,12 +336,12 @@ def do_train(lora_name: str, always_override: bool, save_steps: int, micro_batch
         yield traceback.format_exc()
         return
 
-#    if shared.args.autograd:
-#        for n, m in lora_model.named_modules():
-#            if '4bit' in str(type(m)):
-#                if m.shared.args.v1:
-#                    m.zeros = m.zeros.half()
-#                m.scales = m.scales.half()
+    if shared.args.autograd:
+        for n, m in lora_model.named_modules():
+            if '4bit' in str(type(m)):
+                if shared.args.v1:
+                    m.zeros = m.zeros.half()
+                m.scales = m.scales.half()
 
     class Tracked():
         def __init__(self):
