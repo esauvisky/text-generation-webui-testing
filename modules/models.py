@@ -80,8 +80,12 @@ def load_model(model_name):
     else:
         LoaderClass = AutoModelForCausalLM
 
+    if shared.args.autogptq:
+        from modules import AutoGPTQ_loader
+        AutoGPTQ_loader.set_quantize_config(model_name)
+
     # Load the model in simple 16-bit mode by default
-    if not any([shared.args.cpu, shared.args.load_in_8bit, shared.args.wbits, shared.args.auto_devices, shared.args.disk, shared.args.gpu_memory is not None, shared.args.cpu_memory is not None, shared.args.deepspeed, shared.args.flexgen, shared.model_type in ['rwkv', 'llamacpp']]):
+    if not any([shared.args.cpu, shared.args.load_in_8bit, shared.args.wbits, shared.args.autogptq and AutoGPTQ_loader.has_quantize_config(model_name), shared.args.auto_devices, shared.args.disk, shared.args.gpu_memory is not None, shared.args.cpu_memory is not None, shared.args.deepspeed, shared.args.flexgen, shared.model_type in ['rwkv', 'llamacpp']]):
         model = LoaderClass.from_pretrained(Path(f"{shared.args.model_dir}/{model_name}"), low_cpu_mem_usage=True, torch_dtype=torch.bfloat16 if shared.args.bf16 else torch.float16, trust_remote_code=trust_remote_code)
         if torch.has_mps:
             device = torch.device('mps')
@@ -141,6 +145,10 @@ def load_model(model_name):
         logging.info(f"llama.cpp weights detected: {model_file}\n")
         model, tokenizer = LlamaCppModel.from_pretrained(model_file)
         return model, tokenizer
+
+    #AutoGPTQ
+    elif shared.args.autogptq:
+          model = AutoGPTQ_loader.load_quantized(model_name)
 
     # Quantized model
     elif shared.args.wbits > 0:
@@ -218,7 +226,7 @@ def load_model(model_name):
     # Loading the tokenizer
     if shared.model_type == 'gpt4chan' and Path(f"{shared.args.model_dir}/gpt-j-6B/").exists():
         tokenizer = AutoTokenizer.from_pretrained(Path(f"{shared.args.model_dir}/gpt-j-6B/"))
-    elif type(model) is transformers.LlamaForCausalLM:
+    elif model.__class__.__name__ in ["LlamaForCausalLM", "LlamaGPTQForCausalLM"]:
         tokenizer = None
 
         # Try to load an universal LLaMA tokenizer
