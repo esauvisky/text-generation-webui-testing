@@ -114,7 +114,7 @@ def load_autograd (config_path, model_path):
 #Autograd finalizer
 def finalize_autograd (model):
   
-    model.half() #can't benchmark with lora
+    #model.half() #can't benchmark with lora
     for n, m in model.named_modules():
        if isinstance(m, Autograd4bitQuantLinear):
           if (shared.args.v1 == True):
