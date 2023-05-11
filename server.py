@@ -207,7 +207,7 @@ def update_model_parameters(state, initial=False):
             continue
 
         # Setting null defaults
-        if element in ['wbits', 'groupsize', 'model_type', 'autograd'] and value == 'None':
+        if element in ['wbits', 'groupsize', 'model_type', 'autograd', 'autogptq'] and value == 'None':
             value = vars(shared.args_defaults)[element]
         elif element in ['cpu_memory'] and value == 0:
             value = vars(shared.args_defaults)[element]
@@ -347,11 +347,12 @@ def create_model_menus():
                     with gr.Column():
                         shared.gradio['wbits'] = gr.Dropdown(label="wbits", choices=["None", 1, 2, 3, 4, 8], value=shared.args.wbits if shared.args.wbits > 0 else "None")
                         shared.gradio['groupsize'] = gr.Dropdown(label="groupsize", choices=["None", 32, 64, 128, 1024], value=shared.args.groupsize if shared.args.groupsize > 0 else "None")
+                        shared.gradio['autogptq'] = gr.Checkbox(label="AutoGPTQ", value=shared.args.autogptq)
 
                     with gr.Column():
                         shared.gradio['model_type'] = gr.Dropdown(label="model_type", choices=["None", "llama", "opt", "gptj", "gptneox"], value=shared.args.model_type or "None")
                         shared.gradio['pre_layer'] = gr.Slider(label="pre_layer", minimum=0, maximum=100, value=shared.args.pre_layer)
-                        shared.gradio['autograd'] = gr.Checkbox(label="autograd", value=shared.args.autograd)
+                        shared.gradio['autograd'] = gr.Checkbox(label="Autograd", value=shared.args.autograd)
                         shared.gradio['v1'] = gr.Checkbox(label="GPTQv1 Model (Autograd Only)", value=shared.args.v1)
 
     with gr.Row():
