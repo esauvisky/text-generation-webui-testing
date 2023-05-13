@@ -49,7 +49,7 @@ def calculate_device_mem (model):
             max_memory = {}
             for i in range(len(memory_map)):
                 max_memory[i] = f'{memory_map[i]}GiB' if not re.match('.*ib$', memory_map[i].lower()) else memory_map[i]
-            max_memory['cpu'] = max_cpu_memory
+            max_memory['cpu'] = f'{max_cpu_memory}GiB' if not re.match('.*ib$', max_cpu_memory.lower()) else max_cpu_memory
         else:
             max_memory = accelerate.utils.get_balanced_memory(model)
     return max_memory
@@ -295,6 +295,7 @@ def load_quantized(model_name):
         # accelerate offload (doesn't work properly)
         if shared.args.gpu_memory or torch.cuda.device_count() > 1:
             device_map = accelerate.infer_auto_device_map(model, max_memory=calculate_device_mem(model), no_split_module_classes=["LlamaDecoderLayer", "GPTJBlock", "OPTDecoderLayer", "GPTNeoXLayer"])
+
             logging.info("Using the following device map for the quantized model:", device_map)
             # https://huggingface.co/docs/accelerate/package_reference/big_modeling#accelerate.dispatch_model
             model = accelerate.dispatch_model(model, device_map=device_map, offload_buffers=True)
