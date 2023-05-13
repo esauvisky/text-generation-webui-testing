@@ -8,6 +8,7 @@ extensions/sd_api_pictures/outputs
 extensions/bark_tts/outputs
 extensions/*/outputs
 extensions/multimodal/pipelines
+wanb
 logs
 loras
 models
