@@ -16,7 +16,7 @@
 - 4bit loras only work in autograd
 - Only load one 4bit lora at a time and apply with no loras before switch.
 - Train 4-bit loras 
-- AutoGPTQ (https://github.com/Ph0rk0z/AutoGPTQ) < working snapshot
+- AutoGPTQ (https://github.com/PanQiWei/AutoGPTQ) < Finally Merged
 
 
 #### Depends on:
