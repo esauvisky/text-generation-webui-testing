@@ -22,7 +22,14 @@
 #### Depends on:
 https://github.com/Ph0rk0z/GPTQ-Merged (dual module branch)
 
-https://github.com/sterlind/peft
+~~https://github.com/sterlind/peft~~ (now auto patches)
+
+5/17/23
+```
+Update submodules, supporting a new method of splitting that makes 65b possible over 2, even janky cards at higher speed.
+No more OOM on 65b at full context.
+```
+
 
 5/8/23
 ```
