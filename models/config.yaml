@@ -82,7 +82,7 @@
   instruction_template: 'LLaVA'
   custom_stopping_strings: '"\n###"'
 .*$:
-  mode: 'cai-chat'
+  mode: 'chat'
   instruction_template: 'None'
 .*raven:
   mode: 'instruct'
