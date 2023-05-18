@@ -79,9 +79,7 @@ def load_model(model_name):
         logging.error('The path to the model does not exist. Exiting.')
         return None, None
 
-    if shared.args.autogptq:
-        load_func = AutoGPTQ_loader
-    elif shared.args.wbits > 0:
+    if shared.args.wbits > 0:
         load_func = GPTQ_loader
     elif shared.model_type == 'llamacpp':
         load_func = llamacpp_loader
@@ -144,10 +142,6 @@ def huggingface_loader(model_name):
         LoaderClass = AutoModelForSeq2SeqLM
     else:
         LoaderClass = AutoModelForCausalLM
-
-    if shared.args.autogptq:
-        from modules import AutoGPTQ_loader
-        AutoGPTQ_loader.set_quantize_config(model_name)
 
     # Load the model in simple 16-bit mode by default
     if not any([shared.args.cpu, shared.args.load_in_8bit, shared.args.auto_devices, shared.args.disk, shared.args.deepspeed, shared.args.gpu_memory is not None, shared.args.cpu_memory is not None]):
@@ -268,6 +262,7 @@ def GPTQ_loader(model_name):
         from modules.AutoGPTQ_loader import load_quantized
 
         model = load_quantized(model_name)
+    #Autograd and GPTQ
     else:
         from modules.GPTQ_loader import load_quantized
 
