@@ -26,8 +26,8 @@ https://github.com/Ph0rk0z/GPTQ-Merged (dual module branch)
 
 5/17/23
 ```
-Update submodules, supporting a new method of splitting that makes 65b possible over 2, even janky cards at higher speed.
-No more OOM on 65b at full context.
+Update submodules, supporting a new method of splitting that makes 65b possible over 2, 
+even janky cards at higher speed. No more OOM on 65b at full context.
 ```
 
 
@@ -354,7 +354,7 @@ Optionally, you can use the following command-line flags:
 | `--wbits WBITS`           | GPTQ: Load a pre-quantized model with specified precision in bits. 2, 3, 4 and 8 are supported. |
 | `--model_type MODEL_TYPE` | GPTQ: Model type of pre-quantized model. Currently LLaMA, OPT, and GPT-J are supported. |
 | `--groupsize GROUPSIZE`   | GPTQ: Group size. |
-| `--pre_layer PRE_LAYER`   | GPTQ: The number of layers to allocate to the GPU. Setting this parameter enables CPU offloading for 4-bit models. |
+| `--pre_layer PRE_LAYER [PRE_LAYER ...]`  | The number of layers to allocate to the GPU. Setting this parameter enables CPU offloading for 4-bit models. For multi-gpu, write the numbers separated by spaces, eg `--pre_layer 30 60`. |
 | `--checkpoint CHECKPOINT` | The path to the quantized checkpoint file. If not specified, it will be automatically detected. |
 | `--autograd`   | GPTQ: Autograd implementation to use 4bit lora and run multiple models |
 | `--v1`   | GPTQ: Explicitly declare a GPTQv1 model to load into autograd. |
@@ -362,6 +362,8 @@ Optionally, you can use the following command-line flags:
 | `--quant_attn`         | (triton) Enable quant attention.
 | `--warmup_autotune`    | (triton) Enable warmup autotune.
 | `--fused_mlp`          | (triton) Enable fused mlp.
+| `--autogptq`           | Load with autogptq. Look in shared.py for more options like triton or using act order w/ groupsize kernel
+
 
 #### FlexGen
 
