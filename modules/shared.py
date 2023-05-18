@@ -128,7 +128,7 @@ parser.add_argument('--n-gpu-layers', type=int, default=0, help='Number of layer
 
 # GPTQ
 parser.add_argument('--wbits', type=int, default=0, help='GPTQ: Load a pre-quantized model with specified precision in bits. 2, 3, 4 and 8 are supported.')
-parser.add_argument('--model_type', type=str, help='GPTQ: Model type of pre-quantized model. Currently LLaMA, OPT, and GPT-J are supported.')
+parser.add_argument('--model_type', type=str, help='GPTQ: Model type of pre-quantized model. Currently LLaMA, OPT, GPT-NeoX and GPT-J are supported.')
 parser.add_argument('--groupsize', type=int, default=-1, help='GPTQ: Group size.')
 parser.add_argument('--pre_layer', type=int, nargs="+", help='The number of layers to allocate to the GPU. Setting this parameter enables CPU offloading for 4-bit models. For multi-gpu, write the numbers separated by spaces, eg --pre_layer 30 60.')
 parser.add_argument('--checkpoint', type=str, help='The path to the quantized checkpoint file. If not specified, it will be automatically detected.')
@@ -144,7 +144,6 @@ parser.add_argument('--autogptq-device-map', type=str, default='', help='Device 
 parser.add_argument('--autogptq-act-order', action='store_true', help='Act-order or desc_act for AutoGPTQ.')
 #parser.add_argument('--autogptq-cuda-tweak', action='store_true', help='Use potentially faster CUDA for AutoGPTQ.')
 #parser.add_argument('--autogptq-compat', action='store_true', help='Use compatibility mode for AutoGPTQ.')
-
 
 # FlexGen
 parser.add_argument('--flexgen', action='store_true', help='Enable the use of FlexGen offloading.')
