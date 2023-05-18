@@ -145,11 +145,6 @@ parser.add_argument('--autogptq-act-order', action='store_true', help='Act-order
 #parser.add_argument('--autogptq-cuda-tweak', action='store_true', help='Use potentially faster CUDA for AutoGPTQ.')
 #parser.add_argument('--autogptq-compat', action='store_true', help='Use compatibility mode for AutoGPTQ.')
 
-
-# AutoGPTQ
-parser.add_argument('--autogptq', action='store_true', help='Use AutoGPTQ for loading quantized models instead of the internal GPTQ loader.')
-parser.add_argument('--triton', action='store_true', help='Use triton.')
-
 # FlexGen
 parser.add_argument('--flexgen', action='store_true', help='Enable the use of FlexGen offloading.')
 parser.add_argument('--percent', type=int, nargs="+", default=[0, 100, 100, 0, 100, 0], help='FlexGen: allocation percentages. Must be 6 numbers separated by spaces (default: 0, 100, 100, 0, 100, 0).')
