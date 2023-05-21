@@ -17,7 +17,7 @@ sentencepiece
 tokenizers
 pyyaml
 tqdm
-git+https://github.com/huggingface/peft
+git+https://github.com/huggingface/peft@4fd374e80d670781c0d82c96ce94d1215ff23306
 transformers==4.29.1
 bitsandbytes==0.38.1; platform_system != "Windows"
 llama-cpp-python==0.1.51; platform_system != "Windows"
