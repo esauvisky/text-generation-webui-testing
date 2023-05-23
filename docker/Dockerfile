@@ -63,6 +63,7 @@ RUN . /app/venv/bin/activate && \
 
 RUN cp /app/venv/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cuda118.so /app/venv/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cpu.so
 
+RUN [ ! -f repositories/GPTQ-Merged/setup.py ] && git submodule update --init --recursive || true
 COPY repositories/GPTQ-Merged /app/repositories/GPTQ-Merged
 RUN --mount=type=cache,target=/root/.cache/pip . /app/venv/bin/activate && cd repositories/GPTQ-Merged && pip3 install -U .
 
