@@ -1,9 +1,9 @@
-import logging
 from pathlib import Path
 
 import torch
 import sys
 import modules.shared as shared
+from modules.logging_colors import logger
 
 def autograd_add (lora_path):
 
@@ -50,7 +50,7 @@ def add_lora_to_model(lora_names):
 
     # Add a LoRA when another LoRA is already present
     if len(removed_set) == 0 and len(prior_set) > 0:
-        logging.info(f"Adding the LoRA(s) named {added_set} to the model...")
+        logger.info(f"Adding the LoRA(s) named {added_set} to the model...")
         for lora in added_set:
             shared.model.load_adapter(Path(f"{shared.args.lora_dir}/{lora}"), lora)
 
@@ -67,7 +67,7 @@ def add_lora_to_model(lora_names):
 
 
     if len(lora_names) > 0:
-        logging.info("Applying the following LoRAs to {}: {}".format(shared.model_name, ', '.join(lora_names)))
+        logger.info("Applying the following LoRAs to {}: {}".format(shared.model_name, ', '.join(lora_names)))
         params = {}
         if not shared.args.cpu:
             params['dtype'] = shared.model.dtype
