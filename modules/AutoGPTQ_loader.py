@@ -7,7 +7,6 @@ import logging
 
 import modules.shared as shared
 from modules.logging_colors import logger
-from modules.models import get_max_memory_dict
 
 
 # Used to locate the .bin/.safetensors quantized file
