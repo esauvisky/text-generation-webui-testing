@@ -26,7 +26,7 @@ LABEL maintainer="Your Name <your.email@example.com>"
 LABEL description="Docker image for GPTQ-for-LLaMa and Text Generation WebUI"
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y libportaudio2 libasound-dev git python3 python3-pip make g++ && \
+    apt-get install --no-install-recommends -y libportaudio2 build-essential libasound-dev git python3 python3-pip make g++ cuda-nvcc-11-8 python3-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN --mount=type=cache,target=/root/.cache/pip pip3 install virtualenv
@@ -62,6 +62,9 @@ RUN . /app/venv/bin/activate && \
     pip3 install -r requirements.txt
 
 RUN cp /app/venv/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cuda118.so /app/venv/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cpu.so
+
+COPY repositories/GPTQ-Merged /app/repositories/GPTQ-Merged
+RUN --mount=type=cache,target=/root/.cache/pip . /app/venv/bin/activate && cd repositories/GPTQ-Merged && pip3 install -U .
 
 COPY . /app/
 ENV CLI_ARGS=""
