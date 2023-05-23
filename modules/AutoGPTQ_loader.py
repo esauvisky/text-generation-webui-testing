@@ -6,6 +6,7 @@ import json
 import logging
 
 import modules.shared as shared
+from modules.logging_colors import logger
 
 
 # Used to locate the .bin/.safetensors quantized file
@@ -36,15 +37,15 @@ def find_quantized_model_file(model_name):
 
         if len(found_bins) > 0:
             if len(found_bins) > 1:
-                logging.info('Warning: more than one .bin model has been found. The last one will be selected. It could be wrong.')
+                logger.info('Warning: more than one .bin model has been found. The last one will be selected. It could be wrong.')
             bin_path = found_bins[-1]
         elif len(found_pt) > 0:
             if len(found_pt) > 1:
-                logging.info('Warning: more than one .pt model has been found. The last one will be selected. It could be wrong.')
+                logger.info('Warning: more than one .pt model has been found. The last one will be selected. It could be wrong.')
             bin_path = found_pt[-1]
         elif len(found_safetensors) > 0:
             if len(found_bins) > 1:
-                logging.info('Warning: more than one .safetensors model has been found. The last one will be selected. It could be wrong.')
+                logger.info('Warning: more than one .safetensors model has been found. The last one will be selected. It could be wrong.')
             bin_path = found_safetensors[-1]
 
     return bin_path
@@ -64,12 +65,12 @@ def set_quantize_config(model_name):
                 shared.args.wbits = conf.get('bits', shared.args.wbits)
                 shared.args.groupsize = max(conf.get('group_size', shared.args.groupsize), 0)  # convert -1 to 0
                 shared.args.autogptq_act_order = conf.get('desc_act', shared.args.autogptq_act_order)
-                logging.info(f'Quantize config found for {model_name}. Setting wbits={shared.args.wbits} and groupsize={shared.args.groupsize}. act-order={shared.args.autogptq_act_order}')
+                logger.info(f'Quantize config found for {model_name}. Setting wbits={shared.args.wbits} and groupsize={shared.args.groupsize}. act-order={shared.args.autogptq_act_order}')
     except FileNotFoundError:
-        logging.info(f'No quantize config found for {model_name}.')
+        logger.info(f'No quantize config found for {model_name}.')
         return
     except JsonDecodeError:
-        logging.error(f'quantize_config.json invalid for {model_name}.')
+        logger.error(f'quantize_config.json invalid for {model_name}.')
         return
 
 
@@ -106,19 +107,19 @@ def load_quantized(model_name):
         if total_mem - suggestion < 800:
             suggestion -= 1000
         suggestion = int(round(suggestion / 1000))
-        logging.info(
+        logger.info(
             f"\033[1;32;1mAuto-assigning --gpu-memory {suggestion} for your GPU to try to prevent out-of-memory errors.\nYou can manually set other values.\033[0;37;0m")
 
         max_memory = {0: f'{suggestion}GiB', 'cpu': f'{shared.args.cpu_memory or 99}GiB'}
 
     if max_memory:
-        logging.info(f'max_memory: {max_memory}')
+        logger.info(f'max_memory: {max_memory}')
 
     dev = "cpu" if shared.args.cpu else "cuda:0"  # cpu is not supported for now
 
     #dev = "cuda"
 
-    logging.info(f'Loading quantized model with AutoGPTQ from {model_file}')
+    logger.info(f'Loading quantized model with AutoGPTQ from {model_file}')
 
     model = None
 
@@ -138,7 +139,8 @@ def load_quantized(model_name):
                                                    strict=False,
                                                    warmup_triton=shared.args.warmup_autotune)
     except ValueError:
-        logging.error('Could not load model. The model might be using old quantization. Use the --autogptq-compat flag.')
+        logger.error('Could not load model. The model might be using old quantization. Use the --autogptq-compat flag.')
         raise Exception('Could not load model. The model might be using old quantization. Use the --autogptq-compat flag.')
+
 
     return model
